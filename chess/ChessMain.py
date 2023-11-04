@@ -41,10 +41,13 @@ def main():
     playerClicks = []   # list of selectedSquares (would look like list of tuples)
 
     while running:
+        
         for e in p.event.get():
+            
             if e.type == p.QUIT:
                 print(gs.board)
                 running = False
+            
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()  #(rows, coloumns)
                 col = location[0]//SQ_SIZE    # check this!!!
@@ -52,6 +55,7 @@ def main():
                 
                 if gs.board[row][col] == ".." and len(playerClicks) == 0: #this is the case when we click on an empty square first
                     pass
+        
                 else:
                     if selSquare == (row, col):   # the case where we would be selecting the same square for the seconf time say pawn e2->e2
                         selSquare = ()            # if that would be the case we would simply delect the click 
@@ -88,6 +92,7 @@ def main():
 #drawing the game board and the pieces using the images we loaded above
 
 def drawGameState(screen ,gs):
+    
     colors = [p.Color("light yellow"), p.Color("orangered4")]
     board = gs.board
 

@@ -12,8 +12,8 @@ class gameState():
             ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
             ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
             ["..", "..", "..", "..", "..", "..", "..", ".."],
-            ["..", "..", "..", "..", "..", "..", "..", ".."],
-            ["..", "..", "..", "..", "..", "..", "..", ".."],
+            ["..", "..", "..", "wN", "..", "..", "..", ".."],
+            ["..", "..", "..", "..", "..", "bN", "..", ".."],
             ["..", "..", "..", "..", "..", "..", "..", ".."],
             ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"],
@@ -69,6 +69,9 @@ class gameState():
                     
         return moves
 
+
+    "Move function for each piece"
+
     def getPawnMoves(self,row, col, moves):
         
         if self.whiteToMove:                            #white moves
@@ -76,15 +79,37 @@ class gameState():
                 moves.append(Move((row, col), (row-1, col), self.board))
                 if row == 6 and self.board[row - 2][col] == "..":
                     moves.append(Move((row, col), (row-2, col), self.board)) #2 pawn move
+
+            # CAPTURES for white
+
+            if col-1 >= 0:
+                if self.board[row-1][col-1][0] == 'b':      
+                    moves.append(Move((row, col), (row-1, col-1), self.board))
+            if col+1 <=7:
+                if self.board[row-1][col+1][0] == 'b':
+                    moves.append(Move((row, col), (row-1, col+1), self.board)) 
         
-        elif not self.whiteToMove:
+        elif not self.whiteToMove:                      #black moves
             if self.board[row + 1][col] == "..":        #if there is nothing infront of it
                 moves.append(Move((row, col), (row+1, col), self.board))
                 if row == 1 and self.board[row + 2][col] == "..":
                     moves.append(Move((row, col), (row+2, col), self.board)) #2 pawn move
+            
+            #CAPTURES for black
+
+            if col-1 >= 0:
+                if self.board[row+1][col-1][0] == 'w':
+                    moves.append(Move((row, col), (row+1, col-1), self.board))
+            if col+1 <=7:
+                if self.board[row+1][col+1][0] == 'w':
+                    moves.append(Move((row, col), (row+1, col+1), self.board)) 
                 
 
     def getKnightMoves(self, row, col, moves):
+
+
+        
+
         pass
 
     def getBishopMoves(self, row, col, moves):
