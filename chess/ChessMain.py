@@ -31,6 +31,9 @@ def main():
     screen.fill(p.Color('white'))
     gs = ChessEngine.gameState()
 
+    validMoves = gs.getValidMoves()
+    flagMove = False                    #flag for move made
+
     loadingImages() 
     running = True
     
@@ -40,26 +43,43 @@ def main():
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
+                print(gs.board)
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()  #(rows, coloumns)
                 col = location[0]//SQ_SIZE    # check this!!!
                 row = location[1]//SQ_SIZE
-
-                if selSquare == (row, col):   # the case where we would be selecting the same square for the seconf time say pawn e2->e2
-                    selSquare = ()            # if that would be the case we would simply delect the click 
-                    playerClicks = []
-                else :
-                    selSquare = (row, col)          # if that is not the case we would be storing the selected click as a tuple in the PlayerClicks
-                    playerClicks.append(selSquare)
                 
-                if len(playerClicks) == 2:          #if 2 clicks have been made (e2 -> e4)[(5,2) -> (5,4)]
-                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                    print(move.getChessNotation())
-                    gs.makeMove(move)
-                    selSquare = ()
-                    playerClicks = []               
+                if gs.board[row][col] == ".." and len(playerClicks) == 0: #this is the case when we click on an empty square first
+                    pass
+                else:
+                    if selSquare == (row, col):   # the case where we would be selecting the same square for the seconf time say pawn e2->e2
+                        selSquare = ()            # if that would be the case we would simply delect the click 
+                        playerClicks = []
+                    else :
+                        selSquare = (row, col)          # if that is not the case we would be storing the selected click as a tuple in the PlayerClicks
+                        playerClicks.append(selSquare)
+                    
+                    if len(playerClicks) == 2:          #if 2 clicks have been made (e2 -> e4)[(5,2) -> (5,4)]
+                        move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                        print(move.getChessNotation())
+                        
+                        if move in validMoves:
+                            gs.makeMove(move)
+                            flagMove = True
+                        selSquare = ()
+                        playerClicks = []               
+
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z:
+                    gs.undoMove()
+                    flagMove = True
         
+        if flagMove:
+            validMoves = gs.getValidMoves()
+            flagMove = False
+
+
         drawGameState(screen,gs)
         clock.tick(MAX_FPS)
         p.display.flip()
