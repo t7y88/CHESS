@@ -33,11 +33,32 @@ def main():
 
     loadingImages() 
     running = True
-    while running:
+    
+    selSquare = ()      # keep track of the last clicked sq
+    playerClicks = []   # list of selectedSquares (would look like list of tuples)
 
+    while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+            elif e.type == p.MOUSEBUTTONDOWN:
+                location = p.mouse.get_pos()  #(rows, coloumns)
+                col = location[0]//SQ_SIZE    # check this!!!
+                row = location[1]//SQ_SIZE
+
+                if selSquare == (row, col):   # the case where we would be selecting the same square for the seconf time say pawn e2->e2
+                    selSquare = ()            # if that would be the case we would simply delect the click 
+                    playerClicks = []
+                else :
+                    selSquare = (row, col)          # if that is not the case we would be storing the selected click as a tuple in the PlayerClicks
+                    playerClicks.append(selSquare)
+                
+                if len(playerClicks) == 2:          #if 2 clicks have been made (e2 -> e4)[(5,2) -> (5,4)]
+                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                    print(move.getChessNotation())
+                    gs.makeMove(move)
+                    selSquare = ()
+                    playerClicks = []               
         
         drawGameState(screen,gs)
         clock.tick(MAX_FPS)
@@ -47,7 +68,7 @@ def main():
 #drawing the game board and the pieces using the images we loaded above
 
 def drawGameState(screen ,gs):
-    colors = [p.Color("orangered4"), p.Color("light yellow")]
+    colors = [p.Color("light yellow"), p.Color("orangered4")]
     board = gs.board
 
     for row in range(DIMENSION):
