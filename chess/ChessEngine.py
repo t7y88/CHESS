@@ -109,73 +109,24 @@ class gameState():
 
         # NOT the best coded moves but ill see into it when debugging now the thing is to get them to work
 
+        #improved the way it was coded (less hardcoded can be better ig)
+
+        t = [[-2,-1], [-2,1], [-1,-2], [-1,2], [1,-2], [1,2], [2,-1], [2,1]]
+
         if self.whiteToMove:
 
-            if row+2 <= 7 and col+1 <=7:
-                if self.board[row+2][col+1][0] != "w":
-                    moves.append(Move((row, col), (row+2, col+1), self.board))
+            for i in range(len(t)):
+                if row+(t[i][0]) <= 7 and row+(t[i][0]) >= 0 and col+(t[i][1]) <=7 and col+(t[i][1]) >= 0:
+                    if self.board[row+(t[i][0])][col+(t[i][1])][0] != "w":
+                        moves.append(Move((row, col), (row+(t[i][0]), col+(t[i][1])), self.board))
 
-            if row+1 <= 7 and col+2 <=7:
-                if self.board[row+1][col+2][0] != "w" :
-                    moves.append(Move((row, col), (row+1, col+2), self.board))
             
-            if row-2 >= 0 and col+1 <=7:
-                if self.board[row-2][col+1][0] != "w":
-                    moves.append(Move((row, col), (row-2, col+1), self.board))
-
-            if row-1 >= 0 and col+2 <=7:
-                if self.board[row-1][col+2][0] != "w" :
-                    moves.append(Move((row, col), (row-1, col+2), self.board))
-
-            if row+2 <= 7 and col-1 >=0:
-                if self.board[row+2][col-1][0] != "w":
-                    moves.append(Move((row, col), (row+2, col-1), self.board))
-
-            if row+1 <= 7 and col-2 >=0:
-                if self.board[row+1][col-2][0] != "w" :
-                    moves.append(Move((row, col), (row+1, col-2), self.board))
-            
-            if row-2 >= 0 and col-1 >=0:
-                if self.board[row-2][col-1][0] != "w":
-                    moves.append(Move((row, col), (row-2, col-1), self.board))
-
-            if row-1 >= 0 and col-2 >=0:
-                if self.board[row-1][col-2][0] != "w" :
-                    moves.append(Move((row, col), (row-1, col-2), self.board))
-
         elif not self.whiteToMove:
 
-            if row+2 <= 7 and col+1 <=7:
-                if self.board[row+2][col+1][0] != "b":
-                    moves.append(Move((row, col), (row+2, col+1), self.board))
-
-            if row+1 <= 7 and col+2 <=7:
-                if self.board[row+1][col+2][0] != "b" :
-                    moves.append(Move((row, col), (row+1, col+2), self.board))
-            
-            if row-2 >= 0 and col+1 <=7:
-                if self.board[row-2][col+1][0] != "b":
-                    moves.append(Move((row, col), (row-2, col+1), self.board))
-
-            if row-1 >= 0 and col+2 <=7:
-                if self.board[row-1][col+2][0] != "b" :
-                    moves.append(Move((row, col), (row-1, col+2), self.board))
-
-            if row+2 <= 7 and col-1 >=0:
-                if self.board[row+2][col-1][0] != "b":
-                    moves.append(Move((row, col), (row+2, col-1), self.board))
-
-            if row+1 <= 7 and col-2 >=0:
-                if self.board[row+1][col-2][0] != "b" :
-                    moves.append(Move((row, col), (row+1, col-2), self.board))
-            
-            if row-2 >= 0 and col-1 >=0:
-                if self.board[row-2][col-1][0] != "b":
-                    moves.append(Move((row, col), (row-2, col-1), self.board))
-
-            if row-1 >= 0 and col-2 >=0:
-                if self.board[row-1][col-2][0] != "b" :
-                    moves.append(Move((row, col), (row-1, col-2), self.board))
+            for i in range(len(t)):
+                if row+(t[i][0]) <= 7 and row+(t[i][0]) >= 0 and col+(t[i][1]) <=7 and col+(t[i][1]) >= 0:
+                    if self.board[row+(t[i][0])][col+(t[i][1])][0] != "b":
+                        moves.append(Move((row, col), (row+(t[i][0]), col+(t[i][1])), self.board))
         
 
         pass
