@@ -199,24 +199,15 @@ class gameState():
 
         for d in dir:
 
-            for i in range(1,8):
+            lastRow = row + d[0] 
+            lastCol = col + d[1] 
 
-                lastRow = row + d[0] 
-                lastCol = col + d[1] 
+            if 0 <= lastRow <= 7 and 0 <= lastCol <= 7:
 
-                if 0 <= lastRow <= 7 and 0 <= lastCol <= 7:
-
-                    if self.board[lastRow][lastCol] == "..":
-                        moves.append(Move((row, col), (lastRow,lastCol), self.board))
-                    elif self.board[lastRow][lastCol][0] == enemyColor:
-                        moves.append(Move((row, col), (lastRow,lastCol), self.board))
-                        break
-                    else:
-                        break
+                if self.board[lastRow][lastCol][0] != enemyColor:
+                    moves.append(Move((row, col), (lastRow,lastCol), self.board))
+                    
                 
-                else:
-                    break
-
 class Move():
 
     #we have to convert our rows and coloumn of the board into chessnotations so we would be making dictionaries where we can convert them however we want
