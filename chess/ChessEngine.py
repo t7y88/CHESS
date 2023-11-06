@@ -9,14 +9,14 @@ class gameState():
 
     def __init__(self) -> None:
         self.board = [
-            ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
-            ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
+            ["wB", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
+            ["bp", "..", "bp", "bp", "bp", "bp", "bp", "bp"],
             ["..", "..", "..", "..", "..", "..", "..", ".."],
-            ["..", "..", "..", "wN", "..", "..", "..", ".."],
-            ["..", "..", "..", "..", "..", "bN", "..", ".."],
             ["..", "..", "..", "..", "..", "..", "..", ".."],
-            ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
-            ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"],
+            ["..", "..", "..", "..", "..", "bB", "..", ".."],
+            ["..", "..", "..", "..", "..", "..", "..", ".."],
+            ["wp", "wp", "wp", "wp", "wp", "wp", "..", "wp"],
+            ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", ".."],
         ]
 
         self.whiteToMove = True
@@ -63,7 +63,8 @@ class gameState():
                     elif piece == 'R':
                         self.getRookMoves(row, col, moves)
                     elif piece == 'Q':
-                        self.getQueenMoves(row, col, moves)
+                        self.getBishopMoves(row, col, moves)
+                        self.getRookMoves(row, col, moves)
                     elif piece == 'K':
                         self.getKingMoves(row, col, moves)
                     
@@ -111,37 +112,110 @@ class gameState():
 
         #improved the way it was coded (less hardcoded can be better ig)
 
-        t = [[-2,-1], [-2,1], [-1,-2], [-1,2], [1,-2], [1,2], [2,-1], [2,1]]
-
-        if self.whiteToMove:
-
-            for i in range(len(t)):
-                if row+(t[i][0]) <= 7 and row+(t[i][0]) >= 0 and col+(t[i][1]) <=7 and col+(t[i][1]) >= 0:
-                    if self.board[row+(t[i][0])][col+(t[i][1])][0] != "w":
-                        moves.append(Move((row, col), (row+(t[i][0]), col+(t[i][1])), self.board))
+        t = [[-2,-1], [-2,1], [-1,-2], [-1,2], [1,-2], [1,2], [2,-1], [2,1]] #these are all the possible sq that knight can acsess at best (from say a d4 square)
+            
+        for i in range(len(t)):
+            
+            if row+(t[i][0]) <= 7 and row+(t[i][0]) >= 0 and col+(t[i][1]) <=7 and col+(t[i][1]) >= 0:  #check all the moves that are in the range of the board
+        
+                if self.whiteToMove:                 #WhiteMoves                            
+                
+                    if self.board[row+(t[i][0])][col+(t[i][1])][0] != "w":                                  #check if there is a white peice already standing there
+                        moves.append(Move((row, col), (row+(t[i][0]), col+(t[i][1])), self.board))          # if not then it is a legal move(actually possible legal we would be deciding afterwards)
 
             
-        elif not self.whiteToMove:
+                elif not self.whiteToMove:          # BlackMoves    Same as white 
 
-            for i in range(len(t)):
-                if row+(t[i][0]) <= 7 and row+(t[i][0]) >= 0 and col+(t[i][1]) <=7 and col+(t[i][1]) >= 0:
                     if self.board[row+(t[i][0])][col+(t[i][1])][0] != "b":
                         moves.append(Move((row, col), (row+(t[i][0]), col+(t[i][1])), self.board))
-        
 
         pass
 
     def getBishopMoves(self, row, col, moves):
+
+        dir = [[-1,-1], [-1,1], [1,-1], [1,1]] #all the direction the bishop can move
+
+        enemyColor = "b" if self.whiteToMove else "w"
+
+        for d in dir:                           #iternating through all the directions
+
+            for i in range(1,8):                #iterating through 1 to 8 
+
+                lastRow = row + d[0] * i        #multipling i to the x coordinate and y coordinate
+                lastCol = col + d[1] * i
+
+                if 0 <= lastRow <= 7 and 0 <= lastCol <= 7:     #checking if they are on the board
+
+                    if self.board[lastRow][lastCol] == "..":                            #if the sq is empty then we can append the move
+                        moves.append(Move((row, col), (lastRow,lastCol), self.board))   
+                    elif self.board[lastRow][lastCol][0] == enemyColor:                 #if the sq is of an enemy color 
+                        moves.append(Move((row, col), (lastRow,lastCol), self.board))   #we append the move but we can not go further 
+                        break                                                           #hence a break also put at the end
+                    else:               #if we see an alley piece we also break cant go further 
+                        break
+                
+                else:       #if off board we will simply break 
+                    break
+                
         pass
     
     def getRookMoves(self, row, col, moves):
-        pass
+        
+        #Same as Bishop just directions has changed
 
-    def getQueenMoves(self, row, col, moves):
-        pass
+        dir = [[0,-1], [0,1], [1,0], [-1,0]] #all the direction the rook can move
+
+        enemyColor = "b" if self.whiteToMove else "w"
+
+        for d in dir:
+
+            for i in range(1,8):
+
+                lastRow = row + d[0] * i
+                lastCol = col + d[1] * i
+
+                if 0 <= lastRow <= 7 and 0 <= lastCol <= 7:
+
+                    if self.board[lastRow][lastCol] == "..":
+                        moves.append(Move((row, col), (lastRow,lastCol), self.board))
+                    elif self.board[lastRow][lastCol][0] == enemyColor:
+                        moves.append(Move((row, col), (lastRow,lastCol), self.board))
+                        break
+                    else:
+                        break
+                
+                else:
+                    break
+
 
     def getKingMoves(self, row, col, moves):
-        pass
+
+        #Again using basic modifications it is similar to what we did for Bishop just changes the directions
+
+        dir = [[-1,-1], [-1,0], [-1,1],[0,-1], [0,1],[1,-1], [1,0], [1,1]]
+
+        enemyColor = "b" if self.whiteToMove else "w"
+
+
+        for d in dir:
+
+            for i in range(1,8):
+
+                lastRow = row + d[0] 
+                lastCol = col + d[1] 
+
+                if 0 <= lastRow <= 7 and 0 <= lastCol <= 7:
+
+                    if self.board[lastRow][lastCol] == "..":
+                        moves.append(Move((row, col), (lastRow,lastCol), self.board))
+                    elif self.board[lastRow][lastCol][0] == enemyColor:
+                        moves.append(Move((row, col), (lastRow,lastCol), self.board))
+                        break
+                    else:
+                        break
+                
+                else:
+                    break
 
 class Move():
 
