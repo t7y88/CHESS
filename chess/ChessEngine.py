@@ -23,6 +23,9 @@ class gameState():
         self.moveLog = []
         self.whiteKingLocation = (7,4)
         self.blackKingLocation = (0,4)
+
+        self.stalemate = False
+        self.checkmate = False
     
     def makeMove(self, move):
         
@@ -38,6 +41,11 @@ class gameState():
             self.whiteKingLocation = (move.endRow, move.endCol)
         elif move.pieceMoved == "bK":
             self.blackKingLocation = (move.endRow, move.endCol)
+
+        #pawn Promotion
+        if move.pawnPromotion:
+            self.board[move.endRow][move.endCol] = move.pieceMoved[0] + 'Q'
+            print("HIII")
 
 
     def undoMove(self):
@@ -68,7 +76,15 @@ class gameState():
             self.whiteToMove = not self.whiteToMove 
             self.undoMove()
 
-        print(len(allMoves))
+        if len(allMoves) == 0:
+            if self.isInCheck():
+                self.checkmate == True
+                print("WHITE WON" if not self.whiteToMove else "Black won")
+            else: 
+                self.stalemate == True
+        else:
+            self.checkmate == False
+            self.stalemate == False
 
         return allMoves
 
@@ -129,6 +145,7 @@ class gameState():
     def getPawnMoves(self,row, col, moves):
         
         if self.whiteToMove:                            #white moves
+            
             if self.board[row - 1][col] == "..":        #if there is nothing infront of it
                 moves.append(Move((row, col), (row-1, col), self.board))
                 if row == 6 and self.board[row - 2][col] == "..":
@@ -144,6 +161,7 @@ class gameState():
                     moves.append(Move((row, col), (row-1, col+1), self.board)) 
         
         elif not self.whiteToMove:                      #black moves
+            
             if self.board[row + 1][col] == "..":        #if there is nothing infront of it
                 moves.append(Move((row, col), (row+1, col), self.board))
                 if row == 1 and self.board[row + 2][col] == "..":
@@ -272,6 +290,11 @@ class Move():
         
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
+
+        self.pawnPromotion = False
+
+        if (self.pieceMoved == 'wp' and self.startRow == 1) or (self.pieceMoved == 'bp' and self.startRow == 6):
+            self.pawnPromotion == True
 
         self.moveID = self.startRow*1000 + self.startCol*100 + self.endRow*10 + self.endCol # e2 -> e4 would be 6444
 

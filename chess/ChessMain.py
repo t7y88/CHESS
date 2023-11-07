@@ -68,14 +68,15 @@ def main():
                         move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                         print(move.getChessNotation())
                         
-                        if move in validMoves:
-                            gs.makeMove(move)
-                            flagMove = True
-                            selSquare = ()
-                            playerClicks = []               
+                        for i in range(len(validMoves)):
+                            if move == validMoves[i]:
+                                gs.makeMove(move)
+                                flagMove = True
+                                selSquare = ()
+                                playerClicks = []               
                        
-                        else:
-                            playerClicks=[selSquare]
+                        if not flagMove:    
+                            playerClicks = [selSquare]
 
 
             elif e.type == p.KEYDOWN:
