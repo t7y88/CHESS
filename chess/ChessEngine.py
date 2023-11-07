@@ -9,26 +9,36 @@ class gameState():
 
     def __init__(self) -> None:
         self.board = [
-            ["wB", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
-            ["bp", "..", "bp", "bp", "bp", "bp", "bp", "bp"],
+            ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
+            ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
             ["..", "..", "..", "..", "..", "..", "..", ".."],
             ["..", "..", "..", "..", "..", "..", "..", ".."],
-            ["..", "..", "..", "..", "..", "bB", "..", ".."],
             ["..", "..", "..", "..", "..", "..", "..", ".."],
-            ["wp", "wp", "wp", "wp", "wp", "wp", "..", "wp"],
-            ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", ".."],
+            ["..", "..", "..", "..", "..", "..", "..", ".."],
+            ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
+            ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"],
         ]
 
         self.whiteToMove = True
         self.moveLog = []
-    
+        self.whiteKingLocation = (7,4)
+        self.blackKingLocation = (0,4)
     
     def makeMove(self, move):
         
         self.board[move.startRow][move.startCol] = ".."         #moved the piece from the pos it was so now the square is empty 
         self.board[move.endRow][move.endCol] = move.pieceMoved  
         self.moveLog.append(move)                               #keeping the log
+        
         self.whiteToMove = not self.whiteToMove                 #change the bool to not indicating turn of the other color (switching turns)
+
+        #Update the king position 
+        
+        if move.pieceMoved == "wK":
+            self.whiteKingLocation = (move.endRow, move.endCol)
+        elif move.pieceMoved == "bK":
+            self.blackKingLocation = (move.endRow, move.endCol)
+
 
     def undoMove(self):
 
@@ -38,8 +48,51 @@ class gameState():
             self.board[move.endRow][move.endCol] = move.pieceCaptured
             self.whiteToMove = not self.whiteToMove
 
+            if move.pieceMoved == "wK":
+                self.whiteKingLocation = (move.startRow, move.startCol)
+            elif move.pieceMoved == "bK":
+                self.blackKingLocation = (move.startRow, move.startCol)
+
     def getValidMoves(self):
-        return self.getAllPossibleMoves()
+
+        allMoves = self.getAllPossibleMoves()
+        
+        for i in range(len(allMoves)-1, -1, -1):        #iterating backwards (I always think it is better to iterate from the back)
+            
+            self.makeMove(allMoves[i])                  #if we call makeMove it changes our whiteToMove boolean to not whiteToMove so we have to revert it
+            self.whiteToMove = not self.whiteToMove     # this is beacuse we are just checking if that moves are valid or not 
+
+            if self.isInCheck():
+                allMoves.remove(allMoves[i])
+
+            self.whiteToMove = not self.whiteToMove 
+            self.undoMove()
+
+        print(len(allMoves))
+
+        return allMoves
+
+
+
+    def isInCheck(self):
+        
+        if self.whiteToMove:
+            return self.squareUnderAttack(self.whiteKingLocation[0], self.whiteKingLocation[1])
+        else:
+            return self.squareUnderAttack(self.blackKingLocation[0], self.blackKingLocation[1])
+
+ 
+    def squareUnderAttack(self, row, col):
+        
+        self.whiteToMove = not self.whiteToMove         # We want to see opponents moves (like what is the possible moves for them)
+        oppMoves = self.getAllPossibleMoves()
+        self.whiteToMove = not self.whiteToMove         # switch the turn back
+
+        for move in oppMoves:                               #iterate through opps moves 
+            if move.endRow == row and move.endCol == col:   #check if any of the enemy piece are targeting the row and col we passed in as args                         
+                return True                                  
+        return False
+
 
 
     def getAllPossibleMoves(self):
@@ -71,7 +124,7 @@ class gameState():
         return moves
 
 
-    "Move function for each piece"
+    # Move function for each piece
 
     def getPawnMoves(self,row, col, moves):
         
@@ -114,22 +167,15 @@ class gameState():
 
         t = [[-2,-1], [-2,1], [-1,-2], [-1,2], [1,-2], [1,2], [2,-1], [2,1]] #these are all the possible sq that knight can acsess at best (from say a d4 square)
             
+        teamColor = "w" if self.whiteToMove else "b"
+
         for i in range(len(t)):
             
-            if row+(t[i][0]) <= 7 and row+(t[i][0]) >= 0 and col+(t[i][1]) <=7 and col+(t[i][1]) >= 0:  #check all the moves that are in the range of the board
-        
-                if self.whiteToMove:                 #WhiteMoves                            
+            if row+(t[i][0]) <= 7 and row+(t[i][0]) >= 0 and col+(t[i][1]) <=7 and col+(t[i][1]) >= 0:  #check all the moves that are in the range of the board                 
                 
-                    if self.board[row+(t[i][0])][col+(t[i][1])][0] != "w":                                  #check if there is a white peice already standing there
-                        moves.append(Move((row, col), (row+(t[i][0]), col+(t[i][1])), self.board))          # if not then it is a legal move(actually possible legal we would be deciding afterwards)
+                if self.board[row+(t[i][0])][col+(t[i][1])][0] != teamColor:                                #check if there is a peice of the same color already standing there
+                    moves.append(Move((row, col), (row+(t[i][0]), col+(t[i][1])), self.board))          # if not then it is a legal move(actually "possible legal move" we would be deciding validity afterwards)
 
-            
-                elif not self.whiteToMove:          # BlackMoves    Same as white 
-
-                    if self.board[row+(t[i][0])][col+(t[i][1])][0] != "b":
-                        moves.append(Move((row, col), (row+(t[i][0]), col+(t[i][1])), self.board))
-
-        pass
 
     def getBishopMoves(self, row, col, moves):
 
@@ -190,11 +236,12 @@ class gameState():
 
     def getKingMoves(self, row, col, moves):
 
-        #Again using basic modifications it is similar to what we did for Bishop just changes the directions
+        #Again using basic modifications to it as it is similar to what we did for Bishop 
+        # just changes the directions
 
         dir = [[-1,-1], [-1,0], [-1,1],[0,-1], [0,1],[1,-1], [1,0], [1,1]]
 
-        enemyColor = "b" if self.whiteToMove else "w"
+        teamColor = "w" if self.whiteToMove else "b"
 
 
         for d in dir:
@@ -204,9 +251,9 @@ class gameState():
 
             if 0 <= lastRow <= 7 and 0 <= lastCol <= 7:
 
-                if self.board[lastRow][lastCol][0] != enemyColor:
+                if self.board[lastRow][lastCol][0] != teamColor:
                     moves.append(Move((row, col), (lastRow,lastCol), self.board))
-                    
+
                 
 class Move():
 

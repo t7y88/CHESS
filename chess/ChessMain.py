@@ -71,8 +71,12 @@ def main():
                         if move in validMoves:
                             gs.makeMove(move)
                             flagMove = True
-                        selSquare = ()
-                        playerClicks = []               
+                            selSquare = ()
+                            playerClicks = []               
+                       
+                        else:
+                            playerClicks=[selSquare]
+
 
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z:
