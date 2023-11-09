@@ -9,14 +9,14 @@ class gameState():
 
     def __init__(self) -> None:
         self.board = [
-            ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
+            ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", ".."],
             ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
             ["..", "..", "..", "..", "..", "..", "..", ".."],
             ["..", "..", "..", "..", "..", "..", "..", ".."],
             ["..", "..", "..", "..", "..", "..", "..", ".."],
             ["..", "..", "..", "..", "..", "..", "..", ".."],
             ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
-            ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"],
+            ["..", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"],
         ]
 
         self.whiteToMove = True
@@ -35,6 +35,11 @@ class gameState():
         
         self.whiteToMove = not self.whiteToMove                 #change the bool to not indicating turn of the other color (switching turns)
 
+        # #pawn Promotion
+        # if move.pawnPromotion:
+        #     self.board[move.endRow][move.endCol] = move.pieceMoved[0] + 'Q'
+        #     print("HIII")
+
         #Update the king position 
         
         if move.pieceMoved == "wK":
@@ -42,10 +47,7 @@ class gameState():
         elif move.pieceMoved == "bK":
             self.blackKingLocation = (move.endRow, move.endCol)
 
-        #pawn Promotion
-        if move.pawnPromotion:
-            self.board[move.endRow][move.endCol] = move.pieceMoved[0] + 'Q'
-            print("HIII")
+        
 
 
     def undoMove(self):
@@ -144,13 +146,22 @@ class gameState():
 
     def getPawnMoves(self,row, col, moves):
         
+        
         if self.whiteToMove:                            #white moves
-            
-            if self.board[row - 1][col] == "..":        #if there is nothing infront of it
+
+            if row == 0 :
+                self.board[row][col] = "wQ"
+                moves.append(Move((row,col), (row-1, col), self.board))
+
+
+            elif self.board[row - 1][col] == "..":        #if there is nothing infront of it
                 moves.append(Move((row, col), (row-1, col), self.board))
                 if row == 6 and self.board[row - 2][col] == "..":
                     moves.append(Move((row, col), (row-2, col), self.board)) #2 pawn move
-
+            
+            #pawn promotion
+            
+            
             # CAPTURES for white
 
             if col-1 >= 0:
@@ -162,10 +173,15 @@ class gameState():
         
         elif not self.whiteToMove:                      #black moves
             
-            if self.board[row + 1][col] == "..":        #if there is nothing infront of it
+            if row == 7 :
+                self.board[row][col] = "bQ"
+                moves.append(Move((row,col), (row+1, col), self.board))
+            
+            elif self.board[row + 1][col] == "..":        #if there is nothing infront of it
                 moves.append(Move((row, col), (row+1, col), self.board))
                 if row == 1 and self.board[row + 2][col] == "..":
                     moves.append(Move((row, col), (row+2, col), self.board)) #2 pawn move
+            
             
             #CAPTURES for black
 
@@ -291,10 +307,11 @@ class Move():
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
 
-        self.pawnPromotion = False
+        # self.pawnPromotion = False
 
-        if (self.pieceMoved == 'wp' and self.startRow == 1) or (self.pieceMoved == 'bp' and self.startRow == 6):
-            self.pawnPromotion == True
+        # if (self.pieceMoved == 'wp' and self.endRow == 0) or (self.pieceMoved == 'bp' and self.endRow == 7):
+        #     self.pawnPromotion == True
+        #     print(self.endRow, self.endCol)
 
         self.moveID = self.startRow*1000 + self.startCol*100 + self.endRow*10 + self.endCol # e2 -> e4 would be 6444
 
